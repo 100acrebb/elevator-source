@@ -4,7 +4,7 @@ GM.EntityUseList = {
 	"billiard_table", "billiard_static",
 	"elevator_blender", "elevator_drink",
 	"func_door_rotating", "prop_physics",
-	"elevator_tv", "elevator_tvremote", "elevator_tvvolume"
+	"elevator_tv", "elevator_tvremote", "elevator_tvvolume", "mediaplayer_tv"
 }
 
 GM.BlockedPlayerModels = {
@@ -62,7 +62,9 @@ end
 
 function GM:ResetSpeed( ply )
 
-	GAMEMODE:SetPlayerSpeed( ply, 135, 135 )
+	if IsValid(ply) then
+		GAMEMODE:SetPlayerSpeed( ply, 135, 135 )
+	end
 	
 end
 
@@ -198,14 +200,14 @@ end
  * Disable noclip, excluding the admin
  */
 function GM:PlayerNoClip( ply )
-	return GetConVar("sv_cheats"):GetBool()
+	return ply:IsAdmin()
 end
 
 /**
  * Disable suiciding
  */
 function GM:CanPlayerSuicide( ply )
-	return GetConVar("sv_cheats"):GetBool()
+	return ply:IsAdmin()
 end
 
 /**
@@ -246,7 +248,8 @@ end
  */
 function GM:PlayerCanHearPlayersVoice( pListener, pTalker )
 
-	if pListener:Team() == TEAM_ELEVATOR || pListener:Team() != pTalker:Team() then
+	--if pListener:Team() == TEAM_ELEVATOR || pListener:Team() != pTalker:Team() then
+	if pListener:Team() != pTalker:Team() then
 		return false
 	end
 	
@@ -275,6 +278,7 @@ end
 function GM:Payout( ply, amt )
 
 	// insert your money code here
+	ply:PS_GivePoints(amt)
 
 end
 
@@ -282,7 +286,7 @@ end
  * Disable sprays
  */
 function GM:PlayerSpray( ply )
-	return true
+	return false -- true
 end
 
 concommand.Add( "elev_reset", function( ply, cmd, args )

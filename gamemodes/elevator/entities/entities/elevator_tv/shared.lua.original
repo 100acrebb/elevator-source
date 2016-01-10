@@ -155,8 +155,7 @@ if SERVER then
 	end
 	
 	function ENT:SetTV( ply, vid, dur )
-		print("In SetTV")
-		print ("Setting tv. Vid = ", vid)
+	
 		if ( !IsValid( ply ) ) then return end
 
 		self.VideoID = vid
@@ -254,7 +253,8 @@ if SERVER then
 	
 else // Client
 
-	ENT.URL	= "https://www.youtube.com/"
+	ENT.URL	= "http://www.pixeltailgames.com/elevator/tv/"
+	--ENT.URL	= "http://s1.thehundredacrebloodbath.com/es1/tv/ele_tv.htm"
 
 	function ENT:Draw()
 		self:DrawModel()
@@ -309,24 +309,13 @@ else // Client
 
 	function ENT:UpdateTV( vid, time )
 
-		print("Inside UpdateTV!")
-		print("vid = " , vid)
-		
-		print("self.URL = " , self.URL)
-		
-		
 		if !ValidPanel( self.Browser ) then return end
 		
-		if (vid == nil) then
-			vid = "https://www.youtube.com"
-		end
-		
-		--[[if ( vid && time ) then
+		if ( vid && time ) then
 			self.Browser:OpenURL( self.URL .. "index.php?type=w&t=" .. time .. "&id=" .. vid )
 		else
 			self.Browser:OpenURL( self.URL .. "index.php?type=n" )
-		end]]
-		self.Browser:OpenURL( vid )
+		end
 
 	end
 
@@ -368,7 +357,6 @@ else // Client
 				browser:SetPaintedManually( true )
 				browser:SetParent( nil )
 				browser:SetVisible( false )
-				
 				tv:UpdateTV( tv.VideoID, math.Round( CurTime() - ( tv.VideoStartTime or 0 ) ) )
 				//tv:TurnOff()
 			end
@@ -472,7 +460,6 @@ else // Client
 	
 	usermessage.Hook( "elevator_updatetv", function( um )
 		
-		print ("Got elevator_updatetv!")
 		local ent = um:ReadEntity()
 
 		if !IsValid( ent ) then return end
@@ -480,8 +467,8 @@ else // Client
 		local vid = um:ReadString()
 		local time = um:ReadShort()
 
-		--Msg( vid )
-		print("vid = ", vid)
+		Msg( vid )
+		
 		if ( vid == "" ) then vid = nil end
 		
 		ent:UpdateTV( vid, time )
@@ -547,27 +534,8 @@ if CLIENT then
 	local PANEL = {}
 
 	function PANEL:Init()
-		self.LoadedContent = true
-		
 		self:SetPaintedManually( true )
 		self:AddFunction( "gmt", "VideoID", function( id ) self:SelectedVideo( id ) end )
-		
-		
-		self:AddFunction( "gmod", "getUrl", function( href, finished )
-			
-		--	self:SelectedVideo( href )
-			if finished then
-				--self:OpeningURL( href ) -- browser controls suck
-				--self:FinishedURL( href )
-				print ("href= ", href)
-				RunConsoleCommand( "elev_settv", href, self.Entity:EntIndex() )
-				self.Entity.VideoID = href
-			else
-				--self:OpeningURL( href )
-			end
-		end )
-		
-		
 	end
 
 	function PANEL:SetEntity( ent )
@@ -595,26 +563,6 @@ if CLIENT then
 		end
 
 	end
-	
-	
-	function PANEL:Think()
-
-		if self:IsLoading() then
-			if self.LoadedContent then
-				self:RunJavascript("gmod.getUrl(window.location.href, false);")
-				self.LoadedContent = false
-			end
-		else
-			if !self.LoadedContent then
-				self:RunJavascript("gmod.getUrl(window.location.href, true);")
-				self.LoadedContent = true
-			end
-		end
-
-		
-
-	end
-
 
 	vgui.Register( "EntityHTML", PANEL, "DHTML" )
 

@@ -3,7 +3,7 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 
 Casino.SlotsLocalPlaying = nil
 Casino.SlotsLocalBet = 10
-Casino.SlotsMaxBet = 1000
+Casino.SlotsMaxBet = 10000
 Casino.SlotsSettingBet = false
 
 Cursor2D = surface.GetTextureID( "cursor/cursor_default" )
@@ -167,7 +167,7 @@ end )
 concommand.Add( "slotm_setbet", function( ply, cmd, args )
 	if !Casino.SlotsSettingBet then
 		Casino.SlotsSettingBet = true
-		Derma_StringRequest( "Slot Machine", "Set the amount of money you would like to bet. (10 - 1000)", Casino.SlotsLocalBet, 
+		Derma_StringRequest( "Slot Machine", "Set the amount of money you would like to bet. (10 - 10000)", Casino.SlotsLocalBet, 
 						function( strTextOut )
 							local amount = tonumber( strTextOut ) or Casino.SlotsLocalBet
 							Casino.SlotsLocalBet = math.Clamp( math.Round(amount), 10, Casino.SlotsMaxBet )

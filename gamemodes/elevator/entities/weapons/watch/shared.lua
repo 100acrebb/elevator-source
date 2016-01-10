@@ -32,11 +32,13 @@ SWEP.Delay = {
 	View = 1,
 	Cough = function()
 		if !COOLDOWN_CVAR:GetBool() then return 2 end
-		return math.random(45,60)
+		return 10
+		--return math.random(45,60)
 	end,
 	Slap = function()
 		if !COOLDOWN_CVAR:GetBool() then return 2 end
-		return math.random(120,540)
+		return 10
+		--return math.random(120,540)
 	end,
 	Drink = 25/30 * 2
 }
@@ -62,9 +64,9 @@ function SWEP:Initialize()
 	self.iNextCough = nil
 
 	self:SetWeaponHoldType(self.HoldType)
-
+	
 	self:DrawShadow(false)
-
+	
 	if SERVER then
 		self.Weapon:SetNextSecondaryFire( CurTime() + self.Delay:Cough() )
 	end
@@ -80,32 +82,29 @@ local spin = {
 	min = math.Rand(0,1)
 }
 function SWEP:Think()
-	-- Single player fix
-	if !IsValid(self.Owner) then return end
 
 	local vm = self.Owner:GetViewModel()
-	if !IsValid(self.Owner) then return end
-
+	
 	if SERVER then
-
+	
 		-- Forced cough
 		if self.iNextCough && CurTime() > self.iNextCough then
 			self.iNextCough = nil
 			self:Cough()
 		end
-
+		
 		-- Disable cup bodygroup
 		if !self:IsDrinking() && vm:GetBodygroup(0) == 1 then
 			vm:SetBodygroup(0,0)
 		end
-
+		
 		-- Reset animations
 		if !self:IsInUse() && self:GetSequence() != 0 then -- not in idle animation
 			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 		end
-
+		
 	else
-
+	
 		-- Watch spinning effect
 		if self:IsSpinning() then
 			spin.hour = spin.hour + 0.003
@@ -119,9 +118,9 @@ function SWEP:Think()
 			vm:SetPoseParameter("hhand_rot", hrot)
 			vm:SetPoseParameter("mhand_rot", mrot)
 		end
-
+		
 	end
-
+	
 end
 
 function SWEP:IsInUse()
@@ -133,9 +132,9 @@ end
 
 --[[-----------------------------------------
 		Action Slots
-
+		
 		Christ, this swep ended up
-		being a lot more than what
+		being a lot more than what 
 		we started with...
 -------------------------------------------]]
 SWEP.ActionSlots = {}
@@ -148,7 +147,7 @@ function SWEP:SetNextAction(slot, time)
 	if !self.ActionSlots[slot] then
 		self.ActionSlots[slot] = {}
 	end
-
+	
 	self.ActionSlots[slot].Last = CurTime()
 	self.ActionSlots[slot].Next = time
 end
@@ -204,10 +203,10 @@ end
 
 function SWEP:Cough()
 	if self:IsViewingWatch() then self:SetViewing(false) end
-
+	
 	self.Weapon:SendWeaponAnim(ACT_VM_RECOIL1)
 	self.Owner:EmitSound( GAMEMODE:RandomDefinedSound( SOUNDS_COUGH ), 100, 100)
-
+	
 	self.Weapon:SetNextAction( SLOT_COUGH, CurTime() + self.Delay:Cough() )
 end
 
@@ -221,17 +220,17 @@ end
 function SWEP:Drink()
 	if !SERVER then return end
 	if self:IsViewingWatch() then self:SetViewing(false) end
-
+	
 	local vm = self.Owner:GetViewModel()
 	vm:SetBodygroup(0,1) -- enable cup bodygroup
-
+	
 	self.Weapon:SendWeaponAnim(ACT_VM_FIZZLE) -- fizzle dat soda
-
+	
 	timer.Simple( 2/3, function() -- drinking starts after 20 frames
 		if !IsValid(self) then return end
 		self.Owner:EmitSound( GAMEMODE:RandomDefinedSound( SOUNDS_DRINK ), 60, 100)
 	end)
-
+	
 	self.Weapon:SetNextAction( SLOT_DRINK, CurTime() + self.Delay.Drink )
 end
 
@@ -245,9 +244,9 @@ end
 function SWEP:Slap()
 	if !SERVER then return end
 	if self:IsViewingWatch() then self:SetViewing(false) end
-
+	
 	self.Weapon:SetNextAction( SLOT_SLAP, CurTime() + self.Delay:Slap() )
-
+	
 	local tr = util.TraceHull({
 		start = self.Owner:GetShootPos(),
 		endpos = self.Owner:GetShootPos() + (self.Owner:GetAimVector() * 40),
@@ -255,14 +254,14 @@ function SWEP:Slap()
 		maxs = self.Maxs,
 		filter = self.Owner
 	})
-
+	
 	local EmitSound = self.Sounds.Miss
 	self.Owner:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE)
-
+	
 	if IsFirstTimePredicted() then
 		self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK_2)
 	end
-
+	
 	if tr.Hit then
 		local ent = tr.Entity
 		if IsValid(ent) && ( ent:IsPlayer() || ent:IsNPC() || ent:GetClass() == "prop_physics" ) then
@@ -279,20 +278,20 @@ function SWEP:Slap()
 				dmginfo:SetDamageType(DMG_CLUB)
 				dmginfo:SetInflictor(self.Owner)
 				dmginfo:SetAttacker(self.Owner)
-
+				
 				local vec = (tr.HitPos - pos):GetNormal()
 				if ent:IsPlayer() then -- SetVelocity is more practical for players
 					ent:SetVelocity( vec * SLAPFORCE_CVAR:GetFloat() )
 				else
 					dmginfo:SetDamageForce( vec * 5000 )
 				end
-
+				
 			ent:TakeDamageInfo(dmginfo)
 		else
 			EmitSound = self.Sounds.HitWorld
 		end
 	end
-
+	
 	self.Owner:EmitSound( EmitSound, 65, 100)
 end
 
@@ -312,7 +311,11 @@ function SWEP:PrimaryAttack()
 
 		-- Reset cheap animations
 		for _, bone in pairs(self.CheapAnims.Watch) do
-			self.Owner:ManipulateBoneAngles(self.Owner:LookupBone(bone[1]) or 0, Angle(0,0,0))
+			local bone1 = self.Owner:LookupBone(bone[1])
+			if (bone1 ~= nil) then
+				self.Owner:ManipulateBoneAngles(bone1, Angle(0,0,0))
+			end
+			
 		end
 	else
 		self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
@@ -320,10 +323,13 @@ function SWEP:PrimaryAttack()
 
 		-- Rotate bones so it appears that the player is looking at their watch
 		for _, bone in pairs(self.CheapAnims.Watch) do
-			self.Owner:ManipulateBoneAngles(self.Owner:LookupBone(bone[1]) or 0, bone[2])
+			local bone1 = self.Owner:LookupBone(bone[1])
+			if (bone1 ~= nil) then
+				self.Owner:ManipulateBoneAngles(bone1, bone[2])
+			end
 		end
 	end
-
+	
 	self.Weapon:SetNextPrimaryFire( CurTime() + self.Delay.View )
 end
 
@@ -335,7 +341,7 @@ function SWEP:SecondaryAttack()
 		self:PrimaryAttack() -- stop viewing watch
 		return
 	end
-
+	
 	self:Cough()
 end
 
@@ -347,14 +353,12 @@ function SWEP:Reload()
 		self:PrimaryAttack() -- stop viewing watch
 		return
 	end
-
+	
 	self:Slap()
 end
 
 
 if CLIENT then
-
-	local IsSinglePlayer = game.SinglePlayer
 
 	function SWEP:DrawWorldModel() end -- silly view model thinks it's a world model too
 
@@ -363,41 +367,33 @@ if CLIENT then
 		local attachID = vm:LookupAttachment(attachment)
 		return vm:GetAttachment(attachID)
 	end
-
+	
 	--[[-----------------------------------------
 		CalcView override effect
-
+		
 		Uses attachment angles on view
 		model for view angles
 	-------------------------------------------]]
 	local angdiff = nil
-	local angfix = Angle(0,0,-90)
-
 	function SWEP:CalcView( ply, origin, angles, fov )
-		-- ViewModel.GetAttachment is currently broken in single player
-		-- https://github.com/Facepunch/garrysmod-issues/issues/1255
-		if IsSinglePlayer() then return end
-
 		if !IsValid(self.Owner:GetVehicle()) then -- don't alter calcview when in vehicle
 			local attach = self:GetViewModelAttachment("attach_camera")
 			if !attach then return end
-
-			local ang = attach.Ang
-
-			angdiff = angles - (ang + angfix)
-
+			
+			angdiff = angles - (attach.Ang + Angle(0,0,-90))
+			
 			-- SUPER HACK
 			if (self:IsViewingWatch() || self:GetNextPrimaryFire() > CurTime()) && angdiff.r > 179.9 then -- view is flipped
 				angdiff.p = -(89 - angles.p) -- find pitch difference to stop at 89 degrees
 			end
-
+			
 			angles = angles - angdiff
 		end
-
+		
 		return origin, angles, fov
 	end
-
-end
+	
+end	
 
 function SWEP:CanPrimaryAttack()
 	return true

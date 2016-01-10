@@ -209,6 +209,9 @@ end )
 ---------------------------------------------------------*/
 concommand.Add( "slotm_spin", function( ply, cmd, args )
 	local bet = tonumber(args[1]) or 10
+	
+	
+	
 	local ent = ply.SlotMachine
 	if IsValid(ent) && !ent.SlotsSpinning && !ent.Jackpot then
 		ent.LastSpin = CurTime()
@@ -242,7 +245,6 @@ function ENT:SendPlaying()
 	self.LastSpin = CurTime()
 	
 	local ply = self:GetPlayer()
-	if !IsValid( ply ) then return end
 	ply.SlotMachine = self
 	
 	local rf = RecipientFilter()
@@ -268,6 +270,8 @@ end
 
 function ENT:PickResults()
 
+	self:FixBet()
+	
 	self.SlotsSpinning = true
 	
 	local rf = RecipientFilter()
@@ -275,6 +279,14 @@ function ENT:PickResults()
 	rf:AddAllPlayers()
 	
 	local random = { getRand(), getRand(), getRand() }
+	
+	-- make it harder to win jackpot by 10x
+	if (random[1] == 2 and random[2] == 2 and random[3] == 2) then
+		 if (math.random( 1, 10 ) < 10) then
+			random = { 2, 3, 2 }
+		end
+	end
+	
 	
 	umsg.Start("slotsResult", rf)
 		umsg.Short( self:EntIndex() )
@@ -355,13 +367,13 @@ end
 function ENT:SendWinnings( ply, amount, bJackpot )
 
 	if bJackpot then
-		PrintMessage( HUD_PRINTTALK, "[Slots] " .. ply:Name() .. " HAS WON THE JACKPOT! A total of " .. amount .. " garrybux!" )
+		PrintMessage( HUD_PRINTTALK, "[Slots] " .. ply:Name() .. " HAS WON THE JACKPOT! A total of " .. amount .. " THAB points!" )
 		GAMEMODE:PlayerMessage( ply, "Slots JACKPOT", "YOU WON THE JACKPOT!\nYOU ARE THE GOD OF THE ELEVATOR!", 10 )
 		self:EmitSound( Casino.SlotJackpotSound, 100, 100 )
 		self.Jackpot = CurTime() + 25
 	else
 		self:EmitSound( Casino.SlotWinSound, 75, 100 )
-		GAMEMODE:PlayerMessage( ply, "Slots Winner!", "You won " .. amount .. " garrybux!" )
+		GAMEMODE:PlayerMessage( ply, "Slots Winner!", "You won " .. amount .. " THAB points!" )
 	end
 
 	if self.light then
@@ -372,4 +384,20 @@ function ENT:SendWinnings( ply, amount, bJackpot )
 	
 	//ParticleEffect( "coins", self:GetPos(), self:GetForward(), self )
 	
+end
+
+
+function ENT:FixBet()
+	local ply = self:GetPlayer()
+	local points = ply:PS_GetPoints()
+	local bet = self.BetAmount
+	if points >= bet then
+		ply:PS_TakePoints(bet)
+	else
+		if (bet > 10) then
+			bet = 10
+			GAMEMODE:PlayerMessage( ply, "Warning!", "You don't have enough THAB points to cover your bet.\nYour bet was reduced to 10." )
+			self.BetAmount = 10
+		end
+	end
 end

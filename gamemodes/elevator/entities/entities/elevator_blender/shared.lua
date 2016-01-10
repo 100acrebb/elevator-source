@@ -124,9 +124,11 @@ if SERVER then
 				ply:SetDSP( 31 )
 			end,
 			End = function( ply )
-				PostEvent( ply, "ptime_off" )
-				GAMEMODE:ResetSpeed( ply )
-				ply:SetDSP( 0 )
+				if IsValid(ply) then
+					PostEvent( ply, "ptime_off" )
+					GAMEMODE:ResetSpeed( ply )
+					ply:SetDSP( 0 )
+				end
 			end			
 		},
 		{
@@ -140,6 +142,62 @@ if SERVER then
 			end,
 			End = function( ply )
 				PostEvent( ply, "pbone_off" )
+			end			
+		},
+		{ 
+			Name = "Napalm", 
+			Ingredient1 = APPLE, 
+			Ingredient2 = GLASS,
+			Color = Color( 31, 209, 31 ),
+			Time = 10,
+			Start = function( ply )
+				ply:Ignite(10,0)
+			end,
+			End = function( ply )
+				ulx.explode( nil, {ply} )
+			end			
+		},
+		{ 
+			Name = "Tiny Juice", 
+			Ingredient1 = PLASTIC, 
+			Ingredient2 = APPLE,
+			Color = Color( 31, 209, 31 ),
+			Time = 60,
+			Start = function( ply )
+				ply.OriginalModelScale = ply:GetModelScale()
+				ply:SetModelScale( 0.25, 1 )
+			end,
+			End = function( ply )
+				if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+			end			
+		},
+		{ 
+			Name = "Big Juice", 
+			Ingredient1 = PLASTIC, 
+			Ingredient2 = STRAWBERRY,
+			Color = Color( 31, 209, 31 ),
+			Time = 60,
+			Start = function( ply )
+				ply.OriginalModelScale = ply:GetModelScale()
+				ply:SetModelScale( 2, 1 )
+			end,
+			End = function( ply )
+				if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+			end			
+		},
+		{ 
+			Name = "Inviso Juice", 
+			Ingredient1 = ORANGE, 
+			Ingredient2 = STRAWBERRY,
+			Color = Color( 31, 209, 31 ),
+			Time = 60,
+			Start = function( ply )
+				ULib.invisible( ply, true, 255 ) 
+				PostEvent( ply, "pBWOn" )
+			end,
+			End = function( ply )
+				ULib.invisible( ply, false, 255 ) 
+				PostEvent( ply, "pBWOff" )
 			end			
 		},
 	}
@@ -185,7 +243,7 @@ if SERVER then
 
 		self.Drink = GetDrink( self.Ingredients[1], self.Ingredients[2] )
 		
-		self:EmitSound( "elevator/effects/drink_blend.wav", 80, 100 )
+		self:EmitSound( "elevator/effects/drink_blend.wav", 65, 100,0.5 )
 
 		umsg.Start( "SetBlender" )
 			umsg.Entity( self )

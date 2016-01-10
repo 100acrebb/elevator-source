@@ -86,6 +86,8 @@ GM.LastSongID		= 0 // last intermission song played
 GM.CurrentSongID	= 0 // current intermission song
 GM.CurrentSongTime	= 0 // time before the next song
 
+GM.ThinkTimer 		= 0 -- mtz
+
 //=====================================================
 
 /**
@@ -198,25 +200,29 @@ end
  */
 function GM:Think()
 
-	// Update intermission
-	if ( self.State == STATE_INTERMISSION ) then
-		self:IntermissionThink()
-	end
-	
-	// Remove NPCs after awhile
-	self:NPCRemoveThink()
-
-	// Check if everyone left
-	if ( self:IsPlaying() ) then
-		if ( #team.GetPlayers( TEAM_ELEVATOR ) == 0 ) then
-			self:Restart()
+	if (CurTime() > self.ThinkTimer) then
+		self.ThinkTimer = CurTime() + 1.0
+		
+		// Update intermission
+		if ( self.State == STATE_INTERMISSION ) then
+			self:IntermissionThink()
 		end
-	end
-	
-	// Check if everyone left
-	for _, ply in pairs(team.GetPlayers( TEAM_END )) do
-		if IsValid( ply:GetSaveTable().m_hUseEntity ) then
-			ply.LastPickup = CurTime()
+		
+		// Remove NPCs after awhile
+		self:NPCRemoveThink()
+
+		// Check if everyone left
+		if ( self:IsPlaying() ) then
+			if ( #team.GetPlayers( TEAM_ELEVATOR ) == 0 ) then
+				self:Restart()
+			end
+		end
+		
+		// Check if everyone left
+		for _, ply in pairs(team.GetPlayers( TEAM_END )) do
+			if IsValid( ply:GetSaveTable().m_hUseEntity ) then
+				ply.LastPickup = CurTime()
+			end
 		end
 	end
 
@@ -577,6 +583,8 @@ function GM:MoveAllEnts( fromFloor, toFloor )
 		end
 		
 	end
+	
+	self:Teleport(newtv3, fromFloor, toFloor)
 
 end
 

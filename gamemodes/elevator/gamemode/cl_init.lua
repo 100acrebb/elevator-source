@@ -340,8 +340,12 @@ function GM:CalcView( ply, origin, angle, fov )
 
 	// Get the ragdoll's eyes and set that to the view
 	if IsValid( rag ) then 
-		local att = rag:GetAttachment( rag:LookupAttachment("eyes") ) 
- 		return self.BaseClass:CalcView( ply, att.Pos, att.Ang, fov ) 
+		local att = rag:GetAttachment( rag:LookupAttachment("eyes") )
+		if (att != nil) then
+			return self.BaseClass:CalcView( ply, att.Pos, att.Ang, fov ) 
+		else
+			return self.BaseClass:CalcView( ply, origin, angle, fov ) -- mtz
+		end
  	end
 
 end
@@ -444,18 +448,3 @@ function GM:PostPlayerDraw( ply )
 	end
 
 end
-
-/**
- * Disable Bunny Hopping
- */
-hook.Add( "CreateMove", "DisableBhop", function( input )
-	if !LocalPlayer():Alive() or !LocalPlayer().NextJump then return end
-	if LocalPlayer().NextJump < CurTime() then return end
-	if input:KeyDown( IN_JUMP ) then
-		input:SetButtons( input:GetButtons() - IN_JUMP )
-	end
-end )
-
-hook.Add( "OnPlayerHitGround", "SetNextJump", function( ply, bInWater, bOnFloater, flFallSpeed )
-	ply.NextJump = CurTime() + 0.08
-end )

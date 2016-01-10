@@ -4,7 +4,7 @@ ENT.Ent		= nil
 
 function ENT:Initialize()
 
-	timer.Simple( .1, function()
+	timer.Simple( 1, function()
 
 		self:CreateProp()
 
@@ -32,5 +32,13 @@ function ENT:CreateProp()
 	ent:Activate()
 	
 	self.Ent = ent
+	
+	
+	timer.Simple( 300, function()
+		if ( IsValid( ent ) ) then
+			ent:Remove()
+		end
+
+	end )
 
 end

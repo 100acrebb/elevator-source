@@ -206,21 +206,17 @@ function PLAYER:Paint( w, h )
 
 	surface.SetDrawColor( 255, 255, 255, 255 )
 
-	if IsValid(self.Player) then
+	--[[if PixelTailDevs[ self.Player:SteamID() ] then
 
-		if PixelTailDevs[ self.Player:SteamID() ] then
-
-			surface.SetMaterial( PixeltailIcon )
-			surface.DrawTexturedRect( self.Name.x + self.Name:GetWide() + 5, self.Name.y + 3, 40, 16 )
+		surface.SetMaterial( PixeltailIcon )
+		surface.DrawTexturedRect( self.Name.x + self.Name:GetWide() + 5, self.Name.y + 3, 40, 16 )
+	
+	elseif self.Player:IsAdmin() then
 		
-		elseif self.Player:IsAdmin() then
-			
-			surface.SetMaterial( AdminIcon )
-			surface.DrawTexturedRect( self.Name.x + self.Name:GetWide() + 5, self.Name.y + 3, 40, 16 )
+		surface.SetMaterial( AdminIcon )
+		surface.DrawTexturedRect( self.Name.x + self.Name:GetWide() + 5, self.Name.y + 3, 40, 16 )
 
-		end
-		
-	end
+	end]]
 	
 end
 

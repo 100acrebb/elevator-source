@@ -83,7 +83,7 @@ function GM:MenuShow()
 
 	if !IsValid(LocalPlayer()) then return end
 
-	-- GAMEMODE:ShowMouse()
+	 --GAMEMODE:ShowMouse()
 
 end
 concommand.Add("+menu", GM.MenuShow ) 
@@ -91,7 +91,7 @@ concommand.Add("+menu_context", GM.MenuShow )
 
 function GM:MenuHide()
 
-	-- GAMEMODE:HideMouse()
+	 --GAMEMODE:HideMouse()
 
 end
 concommand.Add("-menu", GM.MenuHide ) 
