@@ -7,6 +7,7 @@ AddCSLuaFile( "cl_legs.lua" )
 AddCSLuaFile( "scoreboard/controls/cl_list.lua" )
 AddCSLuaFile( "scoreboard/cl_playerlist.lua" )
 AddCSLuaFile( "scoreboard/cl_init.lua" )
+AddCSLuaFile( "cl_spawnmenu.lua" ) -- spawn menu
 
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
@@ -21,6 +22,14 @@ AddCSLuaFile( "billiards/cl_billiards.lua" )
 
 include( "postprocess/init.lua" )
 AddCSLuaFile( "postprocess/init.lua" )
+
+include( 'player_spawnm_extension.lua' ) -- spawn menu
+include( 'commands.lua' ) -- spawn menu
+include( 'spawnmenu/init.lua' ) -- spawn menu
+include( 'player_spawnmenu.lua' ) -- spawn menu
+
+
+
 
 //=====================================================
 
@@ -584,7 +593,7 @@ function GM:MoveAllEnts( fromFloor, toFloor )
 		
 	end
 	
-	self:Teleport(newtv3, fromFloor, toFloor)
+	if THAB_NewTV3 then self:Teleport(THAB_NewTV3, fromFloor, toFloor) end
 
 end
 
@@ -1026,7 +1035,7 @@ function GM:RemoveNPC( npc )
 
 end
 
-function GM:EntityTakeDamage( ent, dmginfo  )
+--[[function GM:EntityTakeDamage( ent, dmginfo  )
 
 	if dmginfo:IsFallDamage() then
 		dmginfo:ScaleDamage( 0.0 )
@@ -1036,4 +1045,6 @@ function GM:EntityTakeDamage( ent, dmginfo  )
 		dmginfo:ScaleDamage( 0.0 )
 	end
 
-end
+end]]
+
+

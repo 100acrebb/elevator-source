@@ -7,6 +7,9 @@ include( "shared.lua" )
 include( "billiards/cl_billiards.lua" )
 include( "postprocess/init.lua" )
 
+include( 'cl_spawnmenu.lua' ) -- spawn menu
+
+
 //=====================================================
 
 // Entities to draw a crosshair over
