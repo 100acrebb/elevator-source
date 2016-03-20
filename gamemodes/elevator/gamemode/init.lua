@@ -513,6 +513,8 @@ function GM:HardRestart()
 	self.Ending = nil
 	self:GatherEntityData()
 	
+	hook.Run( "InitPostEntity" )
+	
 end
 
 /**

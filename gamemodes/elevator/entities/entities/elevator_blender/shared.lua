@@ -107,9 +107,11 @@ if SERVER then
 				umsg.End()
 			end,
 			End = function( ply )
-				umsg.Start( "SetDrunk", ply )
-					umsg.Char( 0 )
-				umsg.End()
+				if IsValid(ply) then
+					umsg.Start( "SetDrunk", ply )
+						umsg.Char( 0 )
+					umsg.End()
+				end
 			end
 		},
 		{
