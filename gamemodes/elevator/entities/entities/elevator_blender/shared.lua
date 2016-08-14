@@ -46,7 +46,9 @@ if SERVER then
 				PostEvent( ply, "pcolored_on" )
 			end,
 			End = function( ply )
-				PostEvent( ply, "pcolored_off" )
+				if IsValid(ply) then
+					PostEvent( ply, "pcolored_off" )
+				end
 			end			
 		},
 		{ 
@@ -80,7 +82,7 @@ if SERVER then
 			Start = function( ply )
 				PostEvent( ply, "pdeath" )
 			end,
-			End = function( ply ) ply:Kill() end,
+			End = function( ply ) if IsValid(ply) then ply:Kill() end end,
 		},
 		{ 
 			Name = "Strawberry Banana Shake Boost", 
@@ -92,7 +94,9 @@ if SERVER then
 				GAMEMODE:SetPlayerSpeed( ply, 175, 175 )
 			end,
 			End = function( ply )
-				GAMEMODE:ResetSpeed( ply )
+				if IsValid(ply) then
+					GAMEMODE:ResetSpeed( ply )
+				end
 			end,
 		},
 		{
@@ -143,7 +147,9 @@ if SERVER then
 				PostEvent( ply, "pbone_on" )
 			end,
 			End = function( ply )
-				PostEvent( ply, "pbone_off" )
+				if IsValid(ply) then
+					PostEvent( ply, "pbone_off" )
+				end
 			end			
 		},
 		{ 
@@ -156,7 +162,9 @@ if SERVER then
 				ply:Ignite(10,0)
 			end,
 			End = function( ply )
-				ulx.explode( nil, {ply} )
+				if IsValid(ply) then
+					ulx.explode( nil, {ply} )
+				end
 			end			
 		},
 		{ 
@@ -170,7 +178,9 @@ if SERVER then
 				ply:SetModelScale( 0.25, 1 )
 			end,
 			End = function( ply )
-				if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+				if IsValid(ply) then
+					if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+				end
 			end			
 		},
 		{ 
@@ -184,7 +194,9 @@ if SERVER then
 				ply:SetModelScale( 2, 1 )
 			end,
 			End = function( ply )
-				if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+				if IsValid(ply) then
+					if (ply.OriginalModelScale ~= nil) then ply:SetModelScale( ply.OriginalModelScale, 1 ) end
+				end
 			end			
 		},
 		{ 
@@ -198,8 +210,10 @@ if SERVER then
 				PostEvent( ply, "pBWOn" )
 			end,
 			End = function( ply )
-				ULib.invisible( ply, false, 255 ) 
-				PostEvent( ply, "pBWOff" )
+				if IsValid(ply) then
+					ULib.invisible( ply, false, 255 ) 
+					PostEvent( ply, "pBWOff" )
+				end
 			end			
 		},
 	}
